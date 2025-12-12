@@ -32,7 +32,7 @@ import java.io.File;
 
 public class MainActivity extends AppCompatActivity implements WifiP2pManager.PeerListListener {
     private static final String TAG = "MainActivity";
-    private WebView webView;
+    public WebView webView;
 
     WifiP2pManager manager;
     WifiP2pManager.Channel channel;
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
         }
     }
 
-    void toastAndJs(String msg) {
+    void toastAndJs(final String msg) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
         }
     }
 
-    public void sendFileToPeer(String hostAddress) {
+    public void sendFileToPeer(final String hostAddress) {
         if (selectedFileUri == null) { toastAndJs("No file selected"); return; }
         // Start async transfer to hostAddress on port 8988
         new Thread(new Runnable() {
