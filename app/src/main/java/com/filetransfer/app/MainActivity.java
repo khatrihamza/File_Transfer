@@ -19,10 +19,10 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -66,11 +66,17 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
 
         requestPermissionsIfNeeded();
         // start server to accept incoming files
-        FileTransferService.startServer(this, filePath -> {
-            runOnUiThread(() -> {
-                webView.evaluateJavascript("window.onIncoming('" + escapeJs(filePath) + "')", null);
-                toastAndJs("Received: " + filePath);
-            });
+        FileTransferService.startServer(this, new FileTransferService.FileReceivedCallback() {
+            @Override
+            public void onFileReceived(final String filePath) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        webView.evaluateJavascript("window.onIncoming('" + escapeJs(filePath) + "')", null);
+                        toastAndJs("Received: " + filePath);
+                    }
+                });
+            }
         });
     }
 
@@ -81,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
             perms.add(Manifest.permission.READ_EXTERNAL_STORAGE);
         if (!perms.isEmpty()) {
-            ActivityCompat.requestPermissions(this, perms.toArray(new String[0]), 200);
+            ActivityCompat.requestPermissions(this, perms.toArray(new String[perms.size()]), 200);
         }
     }
 
@@ -105,7 +111,12 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
             sb.append(d.deviceName).append("::").append(d.deviceAddress).append(";;");
         }
         final String js = "window.onPeers('" + escapeJs(sb.toString()) + "')";
-        runOnUiThread(() -> webView.evaluateJavascript(js, null));
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                webView.evaluateJavascript(js, null);
+            }
+        });
     }
 
     private String escapeJs(String s) {
@@ -122,9 +133,12 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
     }
 
     void toastAndJs(String msg) {
-        runOnUiThread(() -> {
-            Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
-            webView.evaluateJavascript("window.onStatus('" + escapeJs(msg) + "')", null);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+                webView.evaluateJavascript("window.onStatus('" + escapeJs(msg) + "')", null);
+            }
         });
     }
 
@@ -146,18 +160,36 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
     public void sendFileToPeer(String hostAddress) {
         if (selectedFileUri == null) { toastAndJs("No file selected"); return; }
         // Start async transfer to hostAddress on port 8988
-        new Thread(() -> {
-            try {
-                InputStream is = getContentResolver().openInputStream(selectedFileUri);
-                if (is == null) { toastAndJs("Unable to open file"); return; }
-                FileTransferService.sendFile(is, hostAddress, 8988, this::onProgress);
-                runOnUiThread(() -> webView.evaluateJavascript("window.onTransferDone('sent')", null));
-            } catch (Exception e) { Log.e(TAG, "sendFile error", e); toastAndJs("Send failed: " + e.getMessage()); }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    InputStream is = getContentResolver().openInputStream(selectedFileUri);
+                    if (is == null) { toastAndJs("Unable to open file"); return; }
+                    FileTransferService.sendFile(is, hostAddress, 8988, new FileTransferService.ProgressCallback() {
+                        @Override
+                        public void onProgress(int percent) {
+                            MainActivity.this.onProgress(percent);
+                        }
+                    });
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            webView.evaluateJavascript("window.onTransferDone('sent')", null);
+                        }
+                    });
+                } catch (Exception e) { Log.e(TAG, "sendFile error", e); toastAndJs("Send failed: " + e.getMessage()); }
+            }
         }).start();
     }
 
-    void onProgress(int percent) {
-        runOnUiThread(() -> webView.evaluateJavascript("window.onProgress(" + percent + ")", null));
+    void onProgress(final int percent) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                webView.evaluateJavascript("window.onProgress(" + percent + ")", null);
+            }
+        });
     }
 
     @Override

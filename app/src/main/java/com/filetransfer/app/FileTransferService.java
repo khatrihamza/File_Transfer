@@ -18,33 +18,36 @@ public class FileTransferService {
     public interface FileReceivedCallback { void onFileReceived(String path); }
     public interface ProgressCallback { void onProgress(int percent); }
 
-    public static void startServer(Context ctx, FileReceivedCallback cb) {
-        new Thread(() -> {
-            ServerSocket server = null;
-            try {
-                server = new ServerSocket(8988);
-                while (true) {
-                    Socket client = server.accept();
-                    InputStream is = client.getInputStream();
-                    // simple protocol: first line filename length then filename then bytes
-                    File downloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                    if (!downloads.exists()) downloads.mkdirs();
-                    File outFile = new File(downloads, "received_" + System.currentTimeMillis());
-                    try (OutputStream os = new FileOutputStream(outFile)) {
-                        byte[] buf = new byte[8192];
-                        int read;
-                        while ((read = is.read(buf)) != -1) {
-                            os.write(buf, 0, read);
+    public static void startServer(Context ctx, final FileReceivedCallback cb) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ServerSocket server = null;
+                try {
+                    server = new ServerSocket(8988);
+                    while (true) {
+                        Socket client = server.accept();
+                        InputStream is = client.getInputStream();
+                        // simple protocol: first line filename length then filename then bytes
+                        File downloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                        if (!downloads.exists()) downloads.mkdirs();
+                        File outFile = new File(downloads, "received_" + System.currentTimeMillis());
+                        try (OutputStream os = new FileOutputStream(outFile)) {
+                            byte[] buf = new byte[8192];
+                            int read;
+                            while ((read = is.read(buf)) != -1) {
+                                os.write(buf, 0, read);
+                            }
+                            os.flush();
                         }
-                        os.flush();
+                        client.close();
+                        if (cb != null) cb.onFileReceived(outFile.getAbsolutePath());
                     }
-                    client.close();
-                    if (cb != null) cb.onFileReceived(outFile.getAbsolutePath());
+                } catch (Exception e) {
+                    Log.e(TAG, "Server error", e);
+                } finally {
+                    try { if (server != null) server.close(); } catch (Exception ignored) {}
                 }
-            } catch (Exception e) {
-                Log.e(TAG, "Server error", e);
-            } finally {
-                try { if (server != null) server.close(); } catch (Exception ignored) {}
             }
         }).start();
     }
