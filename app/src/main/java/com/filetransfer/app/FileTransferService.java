@@ -32,13 +32,17 @@ public class FileTransferService {
                         File downloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
                         if (!downloads.exists()) downloads.mkdirs();
                         File outFile = new File(downloads, "received_" + System.currentTimeMillis());
-                        try (OutputStream os = new FileOutputStream(outFile)) {
+                        OutputStream os = null;
+                        try {
+                            os = new FileOutputStream(outFile);
                             byte[] buf = new byte[8192];
                             int read;
                             while ((read = is.read(buf)) != -1) {
                                 os.write(buf, 0, read);
                             }
                             os.flush();
+                        } finally {
+                            if (os != null) try { os.close(); } catch (Exception e) {}
                         }
                         client.close();
                         if (cb != null) cb.onFileReceived(outFile.getAbsolutePath());
@@ -55,7 +59,9 @@ public class FileTransferService {
     public static void sendFile(InputStream is, String host, int port, ProgressCallback cb) throws Exception {
         Socket socket = new Socket();
         socket.connect(new InetSocketAddress(host, port), 5000);
-        try (OutputStream os = socket.getOutputStream()) {
+        OutputStream os = null;
+        try {
+            os = socket.getOutputStream();
             byte[] buf = new byte[8192];
             long total = 0;
             int read;
@@ -66,8 +72,9 @@ public class FileTransferService {
             }
             os.flush();
         } finally {
-            try { socket.close(); } catch (Exception ignored) {}
-            try { is.close(); } catch (Exception ignored) {}
+            try { if (os != null) os.close(); } catch (Exception ignored) {}
+            try { if (socket != null) socket.close(); } catch (Exception ignored) {}
+            try { if (is != null) is.close(); } catch (Exception ignored) {}
         }
     }
 }

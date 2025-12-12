@@ -38,7 +38,13 @@ public class P2pBroadcastReceiver extends BroadcastReceiver {
                     public void onConnectionInfoAvailable(WifiP2pInfo info) {
                         String hostAddr = info.groupOwnerAddress != null ? info.groupOwnerAddress.getHostAddress() : "";
                         activity.toastAndJs("Connected. Group owner: " + hostAddr);
-                        activity.runOnUiThread(() -> activity.webView.evaluateJavascript("window.onConnectionInfo('" + hostAddr + "')", null));
+                        final String addr = hostAddr;
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                activity.webView.evaluateJavascript("window.onConnectionInfo('" + addr + "')", null);
+                            }
+                        });
                     }
                 });
             } else {
