@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>WiFi Direct — Transfer</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <svg class="logo" width="34" height="34" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" fill="#1E88E5"/><path d="M7 12l3 3 7-7" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div>
+          <div class="title">WiFi Direct</div>
+          <div class="subtitle">Offline peer-to-peer file sharing</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="discoverBtn" class="btn primary" aria-label="Discover peers">Discover</button>
+        <button id="pickBtn" class="btn" aria-label="Pick file">Pick File</button>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="card peersCard">
+        <h3>Peers</h3>
+        <div class="muted small">Tap a peer to fill its IP</div>
+        <ul id="peers" class="peers"></ul>
+      </section>
+
+      <section class="card transferCard">
+        <h3>Transfer</h3>
+        <div id="fileInfo" class="muted">No file selected</div>
+        <div class="preview" id="preview"></div>
+        <div class="controls">
+          <input id="hostInput" placeholder="Peer IP (auto on connect)" />
+          <button id="sendBtn" class="btn success">Send</button>
+        </div>
+        <div class="progressWrap"><div id="progress" class="progressBar"><span id="progressText">0%</span></div></div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <div id="modal" class="modal hidden">
+      <div class="modalCard">
+        <h4 id="modalTitle">Title</h4>
+        <div id="modalBody"></div>
+        <div class="modalActions"><button id="modalClose" class="btn">Close</button></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
