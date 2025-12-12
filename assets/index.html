@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>WiFi Direct Transfer</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">WiFi Direct</div>
+      <div class="actions">
+        <button id="discoverBtn" class="btn primary">Discover</button>
+        <button id="pickBtn" class="btn">Pick File</button>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="card">
+        <h3>Peers</h3>
+        <ul id="peers" class="peers"></ul>
+      </section>
+
+      <section class="card">
+        <h3>Transfer</h3>
+        <div id="fileInfo" class="muted">No file selected</div>
+        <div class="controls">
+          <input id="hostInput" placeholder="Peer IP (auto on connect)" />
+          <button id="sendBtn" class="btn success">Send</button>
+        </div>
+        <div class="progressWrap"><div id="progress" class="progressBar"></div></div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <div id="modal" class="modal hidden">
+      <div class="modalCard">
+        <h4 id="modalTitle">Title</h4>
+        <div id="modalBody"></div>
+        <div class="modalActions"><button id="modalClose" class="btn">Close</button></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

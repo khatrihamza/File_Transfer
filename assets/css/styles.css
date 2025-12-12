@@ -1,0 +1,28 @@
+:root{--bg:#0f1720;--card:#0b1220;--accent:#1E88E5;--accent-2:#1565C0;--muted:#9aa4b2;--success:#4caf50}
+*{box-sizing:border-box;font-family:Inter, Roboto, Arial, sans-serif}
+html,body,#app{height:100%}
+body{margin:0;background:linear-gradient(180deg,#071025 0%, #0f1720 100%);color:#e6eef6}
+.app{max-width:980px;margin:24px auto;padding:18px}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-radius:12px;background:linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));box-shadow:0 6px 20px rgba(2,6,23,0.6)}
+.brand{font-weight:700;font-size:18px}
+.actions .btn{margin-left:8px}
+.content{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.card{background:linear-gradient(180deg,var(--card),rgba(255,255,255,0.02));padding:14px;border-radius:12px;box-shadow:inset 0 1px rgba(255,255,255,0.02)}
+.peers{list-style:none;padding:0;margin:8px 0}
+.peers li{display:flex;justify-content:space-between;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);margin-bottom:8px;align-items:center;transition:transform .15s ease}
+.peers li:hover{transform:translateY(-3px)}
+.btn{background:transparent;border:1px solid rgba(255,255,255,0.06);color:inherit;padding:8px 12px;border-radius:8px;cursor:pointer}
+.btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:0;color:#fff}
+.btn.success{background:linear-gradient(90deg,var(--success),#2e7d32);border:0;color:#fff}
+.muted{color:var(--muted);margin-bottom:8px}
+.controls{display:flex;gap:8px}
+.controls input{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+.progressWrap{height:10px;background:rgba(255,255,255,0.02);margin-top:12px;border-radius:8px;overflow:hidden}
+.progressBar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--success));transition:width .2s}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:rgba(12,18,28,0.9);padding:10px 14px;border-radius:8px;box-shadow:0 8px 30px rgba(2,6,23,0.6)}
+.hidden{display:none}
+.modal{position:fixed;inset:0;background:rgba(2,6,23,0.6);display:flex;align-items:center;justify-content:center}
+.modalCard{background:#081122;padding:18px;border-radius:12px;min-width:280px}
+.modalActions{margin-top:12px;text-align:right}
+
+@media(max-width:720px){.content{grid-template-columns:1fr}}
